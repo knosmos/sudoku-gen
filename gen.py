@@ -57,10 +57,7 @@ def solve(board, findunique = True):
                 else:
                     if valid(solution, currentCell):
                         currentCell += 1
-            #print("\n".join([str([solution[k] for k in range(i*9,i*9+9)]) for i in range(9)])+"\n")
         else:
-            #print("\n".join([str([solution[k] for k in range(i*9,i*9+9)]) for i in range(9)]))
-            #print()
             solutions.append(copy.deepcopy(solution))
             if findunique and len(solutions) == 1:
                 # backtrack
@@ -69,24 +66,7 @@ def solve(board, findunique = True):
                     currentCell -= 1
             else:
                 break
-    #print("\n".join([str([solution[k] for k in range(i*9,i*9+9)]) for i in range(9)]))
     return solutions
-'''
-solve([
-    5,3,0, 0,7,0, 0,0,0,
-    6,0,0, 1,9,5, 0,0,0,
-    0,9,8, 0,0,0, 0,6,0,
-    
-    8,0,0, 0,6,0, 0,0,3,
-    4,0,0, 8,0,3, 0,0,1,
-    7,0,0, 0,2,0, 0,0,6,
-
-    0,6,0, 0,0,0, 2,8,0,
-    0,0,0, 4,1,9, 0,0,5,
-    0,0,0, 0,8,0, 0,7,9
-])'''
-
-#solve([1,2,3,4,5,6,7,8,9,4,5,6,7,8,9,1,2,3]+[0]*63)
 
 def removeSquares(n, board):
     while True:
@@ -118,12 +98,7 @@ def generate(difficulty):
             for j in range(k*3, k*3 + 3):
                 board[i*9 + j] = rand[k][c]
                 c += 1
-    '''n = list(set(list(range(1,10)))-set(rand[0][:3]))
-    random.shuffle(n)
-    for i in range(6):
-        board[i+3] = n[i]'''
-    #print("scaffold:")
-    #print("\n".join([str([board[k] for k in range(i*9,i*9+9)]) for i in range(9)]))
+
     print("\nfilled:")
     board = solve(board, findunique = False)[0]
     printBoard(board)
@@ -134,4 +109,5 @@ def generate(difficulty):
     printBoard(final)
     return final, board # puzzle, solution
 
-generate(50)
+if __name__ == "__main__":
+    generate(50)

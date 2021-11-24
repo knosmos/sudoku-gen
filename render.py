@@ -51,7 +51,7 @@ def generateImg(num=1, difficulty=50):
 def generatePDF(sets, difficulty):
     # Writes [sets] pdfs with 2 pages each; 1st contains six puzzles, and 2nd contains solutions
     for k in range(sets):
-        print(f"generating set {k+1} of {sets} --------")
+        print(f"\033[96mgenerating set {k+1} of {sets} --------\033[0m")
         generateImg(num=6, difficulty=difficulty)
 
         pdf = FPDF('P', 'mm', 'Letter')
@@ -83,8 +83,9 @@ def generatePDF(sets, difficulty):
         for i in range(6):
             pdf.image(f"tmp/solution{i}.png", h=80, x=int(positions[i][1])+px, y=int(positions[i][0])+py)
         pdf.output(f"res/set{k}.pdf","F")
+    print("Generation complete - files stored in /res")
 
-d = 52
+d = 50
 s = 3
 if len(sys.argv) > 1:
     s = sys.argv[1]

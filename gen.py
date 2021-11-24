@@ -69,26 +69,25 @@ def solve(board, findunique = True):
     return solutions
 
 def removeSquares(n, board):
-    c = 0
-    thresh = 5
-    while True:
+    thresh = 10 # How many attempts before we give up on removing any more squares
+    ctr = 0
+    b = copy.deepcopy(board)
+    while ctr < n:
         square = random.randint(0,80)
-        while board[square] == 0:
-            square = random.randint(0,80)
-        b = copy.deepcopy(board)
+        if b[square] == 0:
+            choices = [i for i in range(81) if b[i] != 0]
+            square = random.choice(choices)
+        val = board[square]
         b[square] = 0
-        if len(solve(b)) >= 2:
-            c += 1
-            if c >= thresh:
-                return False
-            continue
-        if n == 0:
-            return b
+        k = solve(b)
+        if len(k) >= 2:
+            thresh -= 1
+            b[square] = val
+            if thresh == 0:
+                break
         else:
-            r = removeSquares(n-1, b)
-            c += 1
-            if r != False:
-                return r
+            ctr += 1
+    return b
 
 def generate(difficulty):
     # Fill in starter squares

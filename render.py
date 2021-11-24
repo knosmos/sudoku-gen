@@ -1,5 +1,6 @@
 from PIL import Image, ImageDraw, ImageFont
 import gen
+import sys
 from fpdf import FPDF
 
 FONT = ImageFont.truetype("helvetica.ttf", 50)
@@ -81,6 +82,12 @@ def generatePDF(sets, difficulty):
 
         for i in range(6):
             pdf.image(f"tmp/solution{i}.png", h=80, x=int(positions[i][1])+px, y=int(positions[i][0])+py)
-        pdf.output(f"set{k}.pdf","F")
+        pdf.output(f"res/set{k}.pdf","F")
 
-generatePDF(3,52)
+d = 52
+s = 3
+if len(sys.argv) > 1:
+    s = sys.argv[1]
+if len(sys.argv) > 2:
+    d = sys.argv[2]
+generatePDF(s,d)

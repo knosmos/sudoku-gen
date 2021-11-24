@@ -69,6 +69,8 @@ def solve(board, findunique = True):
     return solutions
 
 def removeSquares(n, board):
+    c = 0
+    thresh = 5
     while True:
         square = random.randint(0,80)
         while board[square] == 0:
@@ -76,11 +78,17 @@ def removeSquares(n, board):
         b = copy.deepcopy(board)
         b[square] = 0
         if len(solve(b)) >= 2:
+            c += 1
+            if c >= thresh:
+                return False
             continue
         if n == 0:
             return b
         else:
-            return removeSquares(n-1, b)
+            r = removeSquares(n-1, b)
+            c += 1
+            if r != False:
+                return r
 
 def generate(difficulty):
     # Fill in starter squares
@@ -90,7 +98,6 @@ def generate(difficulty):
     for i in range(3):
         random.shuffle(m)
         rand.append(copy.deepcopy(m))
-    print(rand)
     for k in range(3):
         box = []
         c = 0
@@ -99,14 +106,14 @@ def generate(difficulty):
                 board[i*9 + j] = rand[k][c]
                 c += 1
 
-    print("\nfilled:")
+    # print("\nfilled:")
     board = solve(board, findunique = False)[0]
-    printBoard(board)
+    # printBoard(board)
 
     # remove squares one at a time
-    print("\ncomplete:")
+    # print("\ncomplete:")
     final = removeSquares(difficulty, board)
-    printBoard(final)
+    # printBoard(final)
     return final, board # puzzle, solution
 
 if __name__ == "__main__":

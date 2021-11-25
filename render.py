@@ -2,14 +2,17 @@ from PIL import Image, ImageDraw, ImageFont
 import gen
 from fpdf import FPDF
 import click
-import time
-import os
+import time, os, sys, math
 import webbrowser
 
 FONT = ImageFont.truetype("helvetica.ttf", 100)
 CELL = 100 # Pixel size of sudoku cell
 BOLD = 6 # Thickness of bold lines
 THIN = 2
+
+def progressBar(width,i,n,item):
+    sys.stdout.write(f"\r|{'#'*math.ceil(i/n*width)}{'.'*math.floor(width-i/n*width)}|\033[96m {item} {i} of {n}\033[0m\r")
+    sys.stdout.flush()
 
 def renderBoard(board, highlight=[1]*81, highlight_color=(0,0,0)):
     # create image
@@ -46,7 +49,8 @@ def renderBoard(board, highlight=[1]*81, highlight_color=(0,0,0)):
 
 def generateImg(num=1, difficulty=50, set=1, highlight_color=(0,0,0)):
     for i in range(num):
-        print(f"generating {i+1} of {num}...")
+        # print(f"puzzle {i+1} of {num}...")
+        progressBar(15,i+1,num,"puzzle")
         board, solution = gen.generate(difficulty)
         renderBoard(board).save(f"tmp/board{set}_{i}.png")
         renderBoard(solution, highlight=board, highlight_color=highlight_color).save(f"tmp/solution{set}_{i}.png")
@@ -97,8 +101,14 @@ def generatePDF(sets, difficulty, landscape_mode, color_mode):
     pdf.set_font("Arial", "", 20)
     pdf.set_text_color(info_color[0],info_color[1],info_color[2])
 
+    sys.stdout.write("\n")
+    sys.stdout.flush()
     for k in range(sets):
-        print(f"\033[96mgenerating set {k+1} of {sets} --------\033[0m")
+        sys.stdout.write("\x1b[1A")
+        sys.stdout.flush()
+        progressBar(15,k+1,sets,"set")
+        sys.stdout.write("\n")
+        sys.stdout.flush()
         generateImg(num=6, difficulty=difficulty, set=k, highlight_color=highlight_color)
         
         pdf.add_page()
@@ -113,6 +123,8 @@ def generatePDF(sets, difficulty, landscape_mode, color_mode):
         if landscape_mode:
             pdf.text(15, int(h/2), f"sudoku-gen   /   set {k+1} of {sets}   /   created {time.strftime('%Y-%m-%d %H:%M')}   /   solution")
     
+    print()
+    print("Writing pdf...")
     pdf.output("res/res.pdf","F")
     print("Generation complete - file stored in /res")
 

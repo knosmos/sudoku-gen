@@ -1,7 +1,7 @@
 from PIL import Image, ImageDraw, ImageFont
 import gen
-import sys
 from fpdf import FPDF
+import click
 
 FONT = ImageFont.truetype("helvetica.ttf", 100)
 CELL = 100 # Pixel size of sudoku cell
@@ -88,11 +88,9 @@ def generatePDF(sets, difficulty):
     pdf.output("res/res.pdf","F")
     print("Generation complete - file stored in /res")
 
-
-d = 40
-s = 3
-if len(sys.argv) > 1:
-    s = int(sys.argv[1])
-if len(sys.argv) > 2:
-    d = int(sys.argv[2])
-generatePDF(s,d)
+@click.command()
+@click.option('-s', default=3, help='Number of sets to generate')
+@click.option('-d', default=40, help='Difficulty of puzzles')
+def run(s, d):
+    generatePDF(s,d)
+run()

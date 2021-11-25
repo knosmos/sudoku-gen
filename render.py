@@ -9,7 +9,7 @@ import webbrowser
 FONT = ImageFont.truetype("helvetica.ttf", 100)
 CELL = 100 # Pixel size of sudoku cell
 BOLD = 6 # Thickness of bold lines
-THIN = 2 
+THIN = 2
 
 def renderBoard(board, highlight=[1]*81, highlight_color=(0,0,0)):
     # create image
@@ -124,6 +124,19 @@ def generatePDF(sets, difficulty, landscape_mode, color_mode):
 @click.option("-o/-n", default=True, help="Open/Don't open result pdf in web browser")
 
 def run(s, d, l, c, o):
+    # Make folders if necessary
+    try:
+        os.mkdir("tmp")
+        print("\033[93mcreated /tmp/ directory\033[0m")
+    except FileExistsError:
+        pass
+    try:
+        os.mkdir("res")
+        print("\033[93mcreated /res/ directory\033[0m")
+    except FileExistsError:
+        pass
+
+    # Generate PDFs
     generatePDF(s,d,l,c)
     if o:
         print("Opening result pdf in browser...")

@@ -48,14 +48,20 @@ def generateImg(num=1, difficulty=50, set=1):
         renderBoard(board).save(f"tmp/board{set}_{i}.png")
         renderBoard(solution, highlight=board).save(f"tmp/solution{set}_{i}.png")
 
-def generatePDF(sets, difficulty):
+def generatePDF(sets, difficulty, landscape_mode):
     # Writes [sets] sets with 2 pages each; 1st contains six puzzles, and 2nd contains solutions
-    pdf = FPDF('P', 'mm', 'Letter')
+
+    if landscape_mode:
+        pdf = FPDF('L', 'mm', 'Letter')
+        h = 216
+        w = 279 - 20
+    else:
+        pdf = FPDF('P', 'mm', 'Letter')
+        w = 216
+        h = 279 - 20        
+    
     pdf.set_auto_page_break(0)
     
-
-    w = 216
-    h = 279 - 20
     px = 15
     py = 10
 
@@ -68,8 +74,15 @@ def generatePDF(sets, difficulty):
         (2*h/3,w/2)
     ]
 
-    # pdf.set_font('Arial')
-    # pdf.text(12,7, f"sudoku - difficulty {int(difficulty/81*100)}%")
+    if landscape_mode:
+        positions = [
+            (0,0),
+            (0,w/3),
+            (0,2*w/3),
+            (h/2,0),
+            (h/2,w/3),
+            (h/2,2*w/3)
+        ]
 
     for k in range(sets):
         print(f"\033[96mgenerating set {k+1} of {sets} --------\033[0m")
@@ -91,6 +104,8 @@ def generatePDF(sets, difficulty):
 @click.command()
 @click.option('-s', default=3, help='Number of sets to generate')
 @click.option('-d', default=40, help='Difficulty of puzzles')
-def run(s, d):
-    generatePDF(s,d)
+@click.option('-l/-p', default=False, help="Landscape/Portrait mode")
+
+def run(s, d, l):
+    generatePDF(s,d,l)
 run()

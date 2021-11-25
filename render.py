@@ -3,6 +3,8 @@ import gen
 from fpdf import FPDF
 import click
 import time
+import os
+import webbrowser
 
 FONT = ImageFont.truetype("helvetica.ttf", 100)
 CELL = 100 # Pixel size of sudoku cell
@@ -119,8 +121,13 @@ def generatePDF(sets, difficulty, landscape_mode, color_mode):
 @click.option('-d', default=40, help='Difficulty of puzzles')
 @click.option('-l/-p', default=True, help="Landscape/Portrait mode")
 @click.option('-c', is_flag=True, default=False, help='Color mode')
+@click.option("-o/-n", default=True, help="Open/Don't open result pdf in web browser")
 
-def run(s, d, l, c):
+def run(s, d, l, c, o):
     generatePDF(s,d,l,c)
+    if o:
+        print("Opening result pdf in browser...")
+        webbrowser.open(os.path.dirname(os.path.abspath(__file__))+"/res/res.pdf")
+
 if __name__ == "__main__":
     run()

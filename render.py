@@ -116,7 +116,7 @@ def generatePDF(sets, difficulty, landscape_mode, color_mode):
             pdf.image(f"tmp/board{k}_{i}.png", h=80, x=int(positions[i][1])+px, y=int(positions[i][0])+py)
         if landscape_mode:
             pdf.text(15, int(h/2), f"sudoku-gen   /   set {k+1} of {sets}   /   created {time.strftime('%Y-%m-%d %H:%M')}")
-        
+    for k in range(sets):
         pdf.add_page()
         for i in range(6):
             pdf.image(f"tmp/solution{k}_{i}.png", h=80, x=int(positions[i][1])+px, y=int(positions[i][0])+py)

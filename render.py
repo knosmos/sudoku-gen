@@ -55,7 +55,7 @@ def generateImg(num=1, difficulty=50, set=1, highlight_color=(0,0,0)):
         renderBoard(board).save(f"tmp/board{set}_{i}.png")
         renderBoard(solution, highlight=board, highlight_color=highlight_color).save(f"tmp/solution{set}_{i}.png")
 
-def generatePDF(sets, difficulty, landscape_mode, color_mode):
+def generatePDF(sets, difficulty, landscape_mode, color_mode, collate):
     # Writes [sets] sets with 2 pages each; 1st contains six puzzles, and 2nd contains solutions
 
     if landscape_mode:
@@ -72,7 +72,7 @@ def generatePDF(sets, difficulty, landscape_mode, color_mode):
         info_color = (6, 119, 194)
     else:
         highlight_color = (200, 200, 200)
-        info_color = (50, 50, 50)
+        info_color = (100, 100, 100)
     
     pdf.set_auto_page_break(0)
     
@@ -99,7 +99,6 @@ def generatePDF(sets, difficulty, landscape_mode, color_mode):
         ]
 
     pdf.set_font("Arial", "", 20)
-    pdf.set_text_color(info_color[0],info_color[1],info_color[2])
 
     sys.stdout.write("\n")
     sys.stdout.flush()
@@ -115,13 +114,29 @@ def generatePDF(sets, difficulty, landscape_mode, color_mode):
         for i in range(6):
             pdf.image(f"tmp/board{k}_{i}.png", h=80, x=int(positions[i][1])+px, y=int(positions[i][0])+py)
         if landscape_mode:
-            pdf.text(15, int(h/2), f"sudoku-gen   /   set {k+1} of {sets}   /   created {time.strftime('%Y-%m-%d %H:%M')}")
-    for k in range(sets):
-        pdf.add_page()
-        for i in range(6):
-            pdf.image(f"tmp/solution{k}_{i}.png", h=80, x=int(positions[i][1])+px, y=int(positions[i][0])+py)
-        if landscape_mode:
-            pdf.text(15, int(h/2), f"sudoku-gen   /   set {k+1} of {sets}   /   created {time.strftime('%Y-%m-%d %H:%M')}   /   solution")
+            pdf.set_text_color(0,0,0)
+            pdf.text(15, int(h/2), "sudoku-gen")
+            pdf.set_text_color(info_color[0],info_color[1],info_color[2])
+            pdf.text(100, int(h/2), f"set {k+1} of {sets}   /   created {time.strftime('%Y-%m-%d %H:%M')}")
+        if collate:
+            pdf.add_page()
+            for i in range(6):
+                pdf.image(f"tmp/solution{k}_{i}.png", h=80, x=int(positions[i][1])+px, y=int(positions[i][0])+py)
+            if landscape_mode:
+                pdf.set_text_color(0,0,0)
+                pdf.text(15, int(h/2), "sudoku-gen")
+                pdf.set_text_color(info_color[0],info_color[1],info_color[2])
+                pdf.text(100, int(h/2), f"set {k+1} of {sets}   /   created {time.strftime('%Y-%m-%d %H:%M')}   /   solution")
+    if not collate:
+        for k in range(sets):
+            pdf.add_page()
+            for i in range(6):
+                pdf.image(f"tmp/solution{k}_{i}.png", h=80, x=int(positions[i][1])+px, y=int(positions[i][0])+py)
+            if landscape_mode:
+                pdf.set_text_color(0,0,0)
+                pdf.text(15, int(h/2), "sudoku-gen")
+                pdf.set_text_color(info_color[0],info_color[1],info_color[2])
+                pdf.text(100, int(h/2), f"set {k+1} of {sets}   /   created {time.strftime('%Y-%m-%d %H:%M')}   /   solution")
     
     print()
     print("Writing pdf...")
@@ -133,9 +148,10 @@ def generatePDF(sets, difficulty, landscape_mode, color_mode):
 @click.option('-d', default=40, help='Difficulty of puzzles')
 @click.option('-l/-p', default=True, help="Landscape/Portrait mode")
 @click.option('-c', is_flag=True, default=False, help='Color mode')
+@click.option('-a', is_flag=True, default=False, help='Arrange puzzles with solutions (as opposed to separating them)')
 @click.option("-o/-n", default=True, help="Open/Don't open result pdf in web browser")
 
-def run(s, d, l, c, o):
+def run(s, d, l, c, a, o):
     # Make folders if necessary
     try:
         os.mkdir("tmp")
@@ -149,7 +165,7 @@ def run(s, d, l, c, o):
         pass
 
     # Generate PDFs
-    generatePDF(s,d,l,c)
+    generatePDF(s,d,l,c,a)
     if o:
         print("Opening result pdf in browser...")
         webbrowser.open(os.path.dirname(os.path.abspath(__file__))+"/res/res.pdf")

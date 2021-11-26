@@ -13,15 +13,16 @@ Options:
   --help      Show this message and exit.
 ```
 
-## Example
-### Puzzle
-![image](https://user-images.githubusercontent.com/30610197/143372845-4acfa2d6-7d4b-48de-9240-723af6e241e6.png)
-
-### Solution
-![image](https://user-images.githubusercontent.com/30610197/143372875-ffc9d377-f1c1-42e3-92e4-61a0a1afa825.png)
-
 ## Dependencies
 
 - pillow
 - fpdf
 - click
+
+## Example
+### Puzzle
+![image](https://user-images.githubusercontent.com/30610197/143623081-00de0f2e-7744-453f-b21e-a252b5268570.png)
+
+
+### Solution
+![image](https://user-images.githubusercontent.com/30610197/143623101-a6794cde-82c5-4c4d-ae62-091f659d570d.png)

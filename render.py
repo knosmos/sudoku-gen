@@ -11,7 +11,7 @@ BOLD = 6 # Thickness of bold lines
 THIN = 2
 
 def progressBar(width,i,n,item):
-    sys.stdout.write(f"\r|{'#'*math.ceil(i/n*width)}{'.'*math.floor(width-i/n*width)}|\033[96m {item} {i} of {n}\033[0m\r")
+    sys.stdout.write(f"\r|{'#'*math.ceil(i/n*width)}{'.'*math.floor(width-i/n*width)}|{item} {i} of {n}\r")
     sys.stdout.flush()
 
 def renderBoard(board, highlight=[1]*81, highlight_color=(0,0,0)):
@@ -155,12 +155,12 @@ def run(s, d, l, c, a, o):
     # Make folders if necessary
     try:
         os.mkdir("tmp")
-        print("\033[93mcreated /tmp/ directory\033[0m")
+        print("created /tmp/ directory")
     except FileExistsError:
         pass
     try:
         os.mkdir("res")
-        print("\033[93mcreated /res/ directory\033[0m")
+        print("created /res/ directory")
     except FileExistsError:
         pass
 

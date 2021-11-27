@@ -6,17 +6,18 @@ import time, os, sys, math
 import webbrowser
 
 FONT = ImageFont.truetype("helvetica.ttf", 100)
+MINIFONT = ImageFont.truetype("helvetica.ttf", 40)
 CELL = 100 # Pixel size of sudoku cell
 BOLD = 6 # Thickness of bold lines
 THIN = 2
 
 def progressBar(width,i,n,item):
-    sys.stdout.write(f"\r|{'#'*math.ceil(i/n*width)}{'.'*math.floor(width-i/n*width)}|{item} {i} of {n}\r")
+    sys.stdout.write(f"\r|{'#'*math.ceil(i/n*width)}{'.'*math.floor(width-i/n*width)}| {item} {i} of {n}\r")
     sys.stdout.flush()
 
-def renderBoard(board, highlight=[1]*81, highlight_color=(0,0,0)):
+def renderBoard(board, highlight=[1]*81, highlight_color=(0,0,0), hardness=None):
     # create image
-    out = Image.new("RGB", (CELL * 9 + 8, CELL * 9 + 8), (255, 255, 255))
+    out = Image.new("RGB", (CELL * 9 + 8, CELL * 9 + 8 + 50), (255, 255, 255))
 
     # drawing context
     d = ImageDraw.Draw(out)
@@ -45,6 +46,10 @@ def renderBoard(board, highlight=[1]*81, highlight_color=(0,0,0)):
             else:
                 fill = highlight_color
             d.text((CELL*col + 30, CELL*row + 10), str(board[i]), font=FONT, fill=fill)
+    
+    # draw hardness
+    if hardness != None:
+        d.text((0, CELL * 9 + 8 + 5), f"Hardness: {hardness}", font=MINIFONT, fill=(0,0,0))
     return out
 
 def generateImg(num=1, difficulty=50, set=1, highlight_color=(0,0,0)):
@@ -52,7 +57,8 @@ def generateImg(num=1, difficulty=50, set=1, highlight_color=(0,0,0)):
         # print(f"puzzle {i+1} of {num}...")
         progressBar(15,i+1,num,"puzzle")
         board, solution = gen.generate(difficulty)
-        renderBoard(board).save(f"tmp/board{set}_{i}.png")
+        hardness = gen.getHardness(board)
+        renderBoard(board, hardness=hardness).save(f"tmp/board{set}_{i}.png")
         renderBoard(solution, highlight=board, highlight_color=highlight_color).save(f"tmp/solution{set}_{i}.png")
 
 def generatePDF(sets, difficulty, landscape_mode, color_mode, collate):

@@ -115,5 +115,23 @@ def generate(difficulty):
     # printBoard(final)
     return final, board # puzzle, solution
 
+def getHardness(board):
+    # Finds how hard the puzzle is to solve by finding
+    # number of initial possibilities for each square
+    # and then finding the average
+    ctr = 0
+    numEmpty = 0
+    for i in range(81):
+        if board[i] == 0:
+            for j in range(1,10):
+                board[i] = j
+                if valid(board, i):
+                    ctr += 1
+                board[i] = 0
+            numEmpty += 1
+    return round(ctr / numEmpty, 2)
+
 if __name__ == "__main__":
-    generate(50)
+    board = generate(50)[0]
+    printBoard(board)
+    print(getHardness(board))

@@ -1,0 +1,137 @@
+<!-- Webpage for solution viewing -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>sudoku-gen solution viewer</title>
+        <script src = "https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    </head>
+    <body>
+        <style>
+            @font-face {
+                src: url("roboto_slab.ttf");
+                font-family: slab;
+            }
+            html, body {
+                margin: 0;
+                padding: 0;
+                font-family: slab;
+                font-size: 16px;
+            }
+            h1 {
+                font-weight:lighter;
+            }
+            body {
+                padding-left: 15%;
+                padding-right: 15%;
+                filter: blur(0.5px);
+            }
+            #solutions {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 20px;
+            }
+            table {
+                border-collapse: collapse;
+                border: 1px solid black;
+                width: 100%;
+                box-shadow: 0px 0px 10px #c9c9c9;
+            }
+            td {
+                width: 11%; padding-bottom: 11%; height: 0; 
+                border: 2px solid rgb(197, 197, 197);
+                position:relative;
+            }
+            td div {
+                text-align: center;
+                font-size:20pt;
+                position:absolute;
+                width:100%;
+            }
+            td:first-child {
+                border-left:3px solid black;
+            }
+            td:nth-child(3n) {
+                border-right:3px solid black;
+            }
+            tr:first-child {
+                border-top:3px solid black;
+            }
+            tr:nth-child(3n) td {
+                border-bottom:3px solid black;
+            }
+            @media screen and (max-width: 1300px) {
+                body {
+                    padding-left: 10%;
+                    padding-right: 10%;
+                }
+            }
+            @media screen and (max-width: 1000px) {
+                body {
+                    padding-left: 20px;
+                    padding-right: 20px;
+                }
+            }
+            @media screen and (max-width: 800px) {
+                #solutions {
+                    grid-template-columns: repeat(1, 1fr);
+                }
+            }
+        </style>
+        <h1>sudoku-gen <span style="color:rgb(6, 119, 194)">solution viewer</span></h1>
+        <div id="solutions">
+            <div class="solution" v-for="solution in solutions">
+                <table>
+                    <tr v-for="row in solution">
+                        <td v-for="cell in row">
+                            <div>{{ cell }}</div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <br>
+        <script>
+            let urlParams = new URLSearchParams(window.location.search);
+            let data = urlParams.get('d');
+            data = data.split("-");
+            /*let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            let solutions = [];
+            for (let i = 0; i < data.length; i++) {
+                let num = 0;
+                let s = data[i];
+                while (s.length > 0) {
+                    num *= alphabet.length;
+                    num += alphabet.indexOf(s[0]);
+                    s = s.substring(1);
+                }
+                let d = num.toString();
+                console.log(d);
+                let board = [];
+                for (let digit of d) {
+                    board.push(parseInt(digit));
+                }
+                solutions.push(board);
+            }
+            alert(solutions);*/
+            let solutions = [];
+            for (let d of data) {
+                let board = [];
+                let line = [];
+                for (let digit of d) {
+                    line.push(parseInt(digit));
+                    if (line.length == 9) {
+                        board.push(line);
+                        line = [];
+                    }
+                }
+                solutions.push(board);
+            }
+            var app = new Vue({
+                el: '#solutions',
+                data: {
+                    solutions: solutions
+                }
+            });
+        </script>
+    </body>
+</html>

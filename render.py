@@ -2,6 +2,7 @@ from PIL import Image, ImageDraw, ImageFont
 import gen
 from fpdf import FPDF
 import click
+import qrcode
 import time, os, sys, math
 import webbrowser
 
@@ -10,6 +11,8 @@ MINIFONT = ImageFont.truetype("helvetica.ttf", 40)
 CELL = 100 # Pixel size of sudoku cell
 BOLD = 6 # Thickness of bold lines
 THIN = 2
+
+URL = "knosmos.github.io/sudoku-gen?d="
 
 def progressBar(width,i,n,item):
     sys.stdout.write(f"\r|{'#'*math.ceil(i/n*width)}{'.'*math.floor(width-i/n*width)}| {item} {i} of {n}\r")
@@ -53,15 +56,40 @@ def renderBoard(board, highlight=[1]*81, highlight_color=(0,0,0), hardness=None)
     return out
 
 def generateImg(num=1, difficulty=50, set=1, highlight_color=(0,0,0)):
+    puzzles = []
     for i in range(num):
         # print(f"puzzle {i+1} of {num}...")
         progressBar(15,i+1,num,"puzzle")
         board, solution = gen.generate(difficulty)
         hardness = gen.getHardness(board)
+        puzzles.append([board,solution])
         renderBoard(board, hardness=hardness).save(f"tmp/board{set}_{i}.png")
         renderBoard(solution, highlight=board, highlight_color=highlight_color).save(f"tmp/solution{set}_{i}.png")
+    return puzzles
 
-def generatePDF(sets, difficulty, landscape_mode, color_mode, collate):
+def generateQR(puzzles, set):
+    # Encodes solutions in base62 and renders qr code
+    '''
+    strings = []
+    alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+    for puzzle in puzzles:
+        num = int("".join(map(str,puzzle[1])))
+        res = ""
+        while num:
+            res = alphabet[num%len(alphabet)] + res
+            num //= len(alphabet)
+        strings.append(res)
+    print("-".join(strings))
+    qr = qrcode.make(URL+"-".join(strings))
+    '''
+    string = "-".join(["".join([str(i) for i in puzzle[1]]) for puzzle in puzzles])
+    # print()
+    # print(string)
+    # print()
+    qr = qrcode.make(URL+string)
+    qr.save(f"tmp/qr{set}.png")
+
+def generatePDF(sets, difficulty, landscape_mode, color_mode, collate, qr):
     # Writes [sets] sets with 2 pages each; 1st contains six puzzles, and 2nd contains solutions
 
     if landscape_mode:
@@ -109,13 +137,20 @@ def generatePDF(sets, difficulty, landscape_mode, color_mode, collate):
     sys.stdout.write("\n")
     sys.stdout.flush()
     for k in range(sets):
+        # Progress Bar
         sys.stdout.write("\x1b[1A")
         sys.stdout.flush()
         progressBar(15,k+1,sets,"set")
         sys.stdout.write("\n")
         sys.stdout.flush()
-        generateImg(num=6, difficulty=difficulty, set=k, highlight_color=highlight_color)
         
+        # Generate puzzles + images
+        puzzles = generateImg(num=6, difficulty=difficulty, set=k, highlight_color=highlight_color)
+        
+        # Generate QR code
+        generateQR(puzzles, k)
+
+        # Make PDF
         pdf.add_page()
         for i in range(6):
             pdf.image(f"tmp/board{k}_{i}.png", h=80, x=int(positions[i][1])+px, y=int(positions[i][0])+py)
@@ -124,6 +159,8 @@ def generatePDF(sets, difficulty, landscape_mode, color_mode, collate):
             pdf.text(15, int(h/2), "sudoku-gen")
             pdf.set_text_color(info_color[0],info_color[1],info_color[2])
             pdf.text(100, int(h/2), f"set {k+1} of {sets}   /   created {time.strftime('%Y-%m-%d %H:%M')}")
+            if qr:
+                pdf.image(f"tmp/qr{k}.png", h=30, x=235, y=int(h/2)-20)
         if collate:
             pdf.add_page()
             for i in range(6):
@@ -150,14 +187,15 @@ def generatePDF(sets, difficulty, landscape_mode, color_mode, collate):
     print("Generation complete - file stored in /res")
 
 @click.command()
-@click.option('-s', default=3, help='Number of sets to generate')
-@click.option('-d', default=40, help='Difficulty of puzzles')
-@click.option('-l/-p', default=True, help="Landscape/Portrait mode")
-@click.option('-c', is_flag=True, default=False, help='Color mode')
-@click.option('-a', is_flag=True, default=False, help='Arrange puzzles with solutions (as opposed to separating them)')
-@click.option("-o/-n", default=True, help="Open/Don't open result pdf in web browser")
+@click.option('-s','--sets', default=3, help='Number of sets to generate')
+@click.option('-d','--difficulty', default=40, help='Difficulty of puzzles')
+@click.option('-q/-h','--qr/--hideqr', default=True, help='Display QR code solutions')
+@click.option('-l/-p','--landscape/--portrait', default=True, help="Landscape/Portrait mode")
+@click.option('-c','--color', is_flag=True, default=False, help='Color mode')
+@click.option('-a','--arrange', is_flag=True, default=False, help='Arrange puzzles with solutions (as opposed to separating them)')
+@click.option("-o/-n",'--display/--nodisplay', default=True, help="Open/Don't open result pdf in web browser")
 
-def run(s, d, l, c, a, o):
+def run(sets, difficulty, qr, landscape, color, arrange, display):
     # Make folders if necessary
     try:
         os.mkdir("tmp")
@@ -171,8 +209,8 @@ def run(s, d, l, c, a, o):
         pass
 
     # Generate PDFs
-    generatePDF(s,d,l,c,a)
-    if o:
+    generatePDF(sets,difficulty,landscape,color,arrange,qr)
+    if display:
         print("Opening result pdf in browser...")
         webbrowser.open(os.path.dirname(os.path.abspath(__file__))+"/res/res.pdf")
 

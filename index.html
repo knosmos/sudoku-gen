@@ -3,6 +3,7 @@
 <html>
     <head>
         <title>sudoku-gen solution viewer</title>
+        <meta viewport="width=device-width, initial-scale=1.0">
         <script src = "https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     </head>
     <body>
@@ -23,7 +24,6 @@
             body {
                 padding-left: 15%;
                 padding-right: 15%;
-                filter: blur(0.5px);
             }
             #solutions {
                 display: grid;
@@ -93,6 +93,9 @@
         <script>
             let urlParams = new URLSearchParams(window.location.search);
             let data = urlParams.get('d');
+            if (!data) {
+                location.href="https://github.com/knosmos/sudoku-gen";
+            }
             data = data.split("-");
             /*let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
             let solutions = [];

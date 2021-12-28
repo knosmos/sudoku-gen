@@ -67,22 +67,9 @@ def generateImg(num=1, difficulty=50, set=1, highlight_color=(0,0,0)):
         renderBoard(solution, highlight=board, highlight_color=highlight_color).save(f"tmp/solution{set}_{i}.png")
     return puzzles
 
-def generateQR(puzzles, set):
-    # Encodes solutions in base62 and renders qr code
-    '''
+def generateQR(puzzles, set, color=(0,0,0)):
     strings = []
-    alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-    for puzzle in puzzles:
-        num = int("".join(map(str,puzzle[1])))
-        res = ""
-        while num:
-            res = alphabet[num%len(alphabet)] + res
-            num //= len(alphabet)
-        strings.append(res)
-    print("-".join(strings))
-    qr = qrcode.make(URL+"-".join(strings))
-    '''
-    strings = []
+    qr = qrcode.QRCode()
     for p in puzzles:
         s = ""
         for j in range(81):
@@ -92,11 +79,9 @@ def generateQR(puzzles, set):
                 s += str(p[1][j])
         strings.append(s)
     string = "-".join(strings)
-    #print()
-    #print(string)
-    #print()
-    qr = qrcode.make(URL+string)
-    qr.save(f"tmp/qr{set}.png")
+    qr.add_data(URL+string)
+    img = qr.make_image(fill_color = color)
+    img.save(f"tmp/qr{set}.png")
 
 def generatePDF(sets, difficulty, landscape_mode, color_mode, collate, qr):
     # Writes [sets] sets with 2 pages each; 1st contains six puzzles, and 2nd contains solutions
@@ -157,7 +142,7 @@ def generatePDF(sets, difficulty, landscape_mode, color_mode, collate, qr):
         puzzles = generateImg(num=6, difficulty=difficulty, set=k, highlight_color=highlight_color)
         
         # Generate QR code
-        generateQR(puzzles, k)
+        generateQR(puzzles, k, info_color)
 
         # Make PDF
         pdf.add_page()
@@ -169,7 +154,7 @@ def generatePDF(sets, difficulty, landscape_mode, color_mode, collate, qr):
             pdf.set_text_color(info_color[0],info_color[1],info_color[2])
             pdf.text(100, int(h/2), f"set {k+1} of {sets}   /   created {time.strftime('%Y-%m-%d %H:%M')}")
             if qr:
-                pdf.image(f"tmp/qr{k}.png", h=30, x=235, y=int(h/2)-20)
+                pdf.image(f"tmp/qr{k}.png", h=30, x=234, y=int(h/2)-21)
         if collate:
             pdf.add_page()
             for i in range(6):

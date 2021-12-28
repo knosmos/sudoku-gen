@@ -82,10 +82,19 @@ def generateQR(puzzles, set):
     print("-".join(strings))
     qr = qrcode.make(URL+"-".join(strings))
     '''
-    string = "-".join(["".join([str(i) for i in puzzle[1]]) for puzzle in puzzles])
-    # print()
-    # print(string)
-    # print()
+    strings = []
+    for p in puzzles:
+        s = ""
+        for j in range(81):
+            if p[0][j] == 0:
+                s += "ABCDEFGHIJ"[p[1][j]]
+            else:
+                s += str(p[1][j])
+        strings.append(s)
+    string = "-".join(strings)
+    #print()
+    #print(string)
+    #print()
     qr = qrcode.make(URL+string)
     qr.save(f"tmp/qr{set}.png")
 

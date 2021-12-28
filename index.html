@@ -3,19 +3,19 @@
 <html>
     <head>
         <title>sudoku-gen solution viewer</title>
-        <meta viewport="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <script src = "https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     </head>
     <body>
         <style>
             @font-face {
-                src: url("roboto_slab.ttf");
-                font-family: slab;
+                src: url("helvetica.ttf");
+                font-family: helvetica;
             }
             html, body {
                 margin: 0;
                 padding: 0;
-                font-family: slab;
+                font-family: helvetica;
                 font-size: 16px;
             }
             h1 {
@@ -46,6 +46,8 @@
                 font-size:20pt;
                 position:absolute;
                 width:100%;
+                padding:0;
+                margin:0;
             }
             td:first-child {
                 border-left:3px solid black;
@@ -83,7 +85,7 @@
                 <table>
                     <tr v-for="row in solution">
                         <td v-for="cell in row">
-                            <div>{{ cell }}</div>
+                            <div v-bind:style="{color:cell[1]}">{{ cell[0] }}</div>
                         </td>
                     </tr>
                 </table>
@@ -97,31 +99,18 @@
                 location.href="https://github.com/knosmos/sudoku-gen";
             }
             data = data.split("-");
-            /*let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
             let solutions = [];
-            for (let i = 0; i < data.length; i++) {
-                let num = 0;
-                let s = data[i];
-                while (s.length > 0) {
-                    num *= alphabet.length;
-                    num += alphabet.indexOf(s[0]);
-                    s = s.substring(1);
-                }
-                let d = num.toString();
-                console.log(d);
-                let board = [];
-                for (let digit of d) {
-                    board.push(parseInt(digit));
-                }
-                solutions.push(board);
-            }
-            alert(solutions);*/
-            let solutions = [];
+            let letters = "ABCDEFGHIJ";
             for (let d of data) {
                 let board = [];
                 let line = [];
                 for (let digit of d) {
-                    line.push(parseInt(digit));
+                    let color = "black";
+                    if (letters.includes(digit)) {
+                        color = "rgb(6, 119, 194)";
+                        digit = letters.indexOf(digit);
+                    }
+                    line.push([parseInt(digit), color]);
                     if (line.length == 9) {
                         board.push(line);
                         line = [];

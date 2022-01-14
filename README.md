@@ -1,7 +1,7 @@
 # sudoku-gen
-I like playing sudoku. I don't like paying for sudoku books. So, I made this: a simple program to generate sudoku puzzle PDFs.
+I like playing sudoku. I don't like paying for sudoku books. So, I made this: a simple program to generate sudoku puzzle PDFs. Also features QR code solutions.
 
-![image](https://user-images.githubusercontent.com/30610197/143623081-00de0f2e-7744-453f-b21e-a252b5268570.png)
+![image](https://user-images.githubusercontent.com/30610197/149524429-65066143-dc10-44a5-b363-195429376460.png)
 
 ## Installation
 ### Dependencies
